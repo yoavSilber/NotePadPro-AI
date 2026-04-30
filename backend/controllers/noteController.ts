@@ -8,6 +8,7 @@ import {
   getNoteByIndex,
   updateNoteByIndex,
   deleteNoteByIndex,
+  summarizeNoteById,
 } from "../services/noteService";
 import { AuthenticatedRequest } from "../middlewares/auth";
 import { asyncHandler } from "../utils/asyncHandler";
@@ -115,6 +116,42 @@ export const deleteNote = asyncHandler(
     const deletedNote = await deleteNoteById(id);
 
     res.status(204).end(); // No Content
+  }
+);
+
+export const summarizeNote = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+
+    if (!req.user) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const existingNote = await getNoteById(id);
+    if (!existingNote) {
+      return res.status(404).json({ error: "Note not found" });
+    }
+
+    if (
+      existingNote.user &&
+      existingNote.user.toString() !== req.user._id.toString()
+    ) {
+      return res
+        .status(403)
+        .json({
+          error: "Access denied. You can only summarize your own notes.",
+        });
+    }
+
+    const updated = await summarizeNoteById(id);
+    if (!updated) {
+      return res.status(404).json({ error: "Note not found" });
+    }
+
+    res.status(200).json({
+      summary: updated.summary,
+      summarizedAt: updated.summarizedAt,
+    });
   }
 );
 

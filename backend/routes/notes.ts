@@ -5,6 +5,7 @@ import {
   addNote,
   updateNote,
   deleteNote,
+  summarizeNote,
   getNoteByIndexHandler,
   updateNoteByIndexHandler,
   deleteNoteByIndexHandler,
@@ -21,6 +22,7 @@ router.get("/notes/:id", getNote);
 router.post("/notes", userExtractor, addNote);
 router.put("/notes/:id", userExtractor, updateNote);
 router.delete("/notes/:id", userExtractor, deleteNote);
+router.post("/notes/:id/summarize", userExtractor, summarizeNote);
 router.get("/notes/by-index/:i", getNoteByIndexHandler);
 router.put("/notes/by-index/:i", userExtractor, updateNoteByIndexHandler);
 router.delete("/notes/by-index/:i", userExtractor, deleteNoteByIndexHandler);

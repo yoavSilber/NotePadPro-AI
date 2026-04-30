@@ -1,5 +1,10 @@
 import { Note } from "../models/noteModel";
 import mongoose from "mongoose";
+import { createHash } from "crypto";
+import * as ml from "./mlService";
+
+const sha256 = (text: string) =>
+  createHash("sha256").update(text).digest("hex");
 
 export const getPaginatedNotes = async (_page: number, _per_page: number) => {
   const skip = (_page - 1) * _per_page;
@@ -76,4 +81,27 @@ export const deleteNoteByIndex = async (i: number) => {
   if (!target) return null;
 
   return await Note.findByIdAndDelete(target._id);
+};
+
+export const summarizeNoteById = async (id: string) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) return null;
+
+  const note = await Note.findById(id);
+  if (!note) return null;
+
+  const contentHash = sha256(note.content);
+
+  // Cache hit: same content was already summarized.
+  if (note.summary && note.summaryHash === contentHash) {
+    return note;
+  }
+
+  const summary = await ml.summarize(note.content);
+
+  note.summary = summary;
+  note.summaryHash = contentHash;
+  note.summarizedAt = new Date();
+  await note.save();
+
+  return note;
 };

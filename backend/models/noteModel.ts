@@ -21,6 +21,11 @@ const noteSchema = new mongoose.Schema({
     ref: "User",
     required: false,
   },
+  summary: { type: String, required: false },
+  summarizedAt: { type: Date, required: false },
+  summaryHash: { type: String, required: false },
+  embedding: { type: [Number], required: false, select: false },
+  embeddingHash: { type: String, required: false },
 });
 
 export const Note = mongoose.model("Note", noteSchema);

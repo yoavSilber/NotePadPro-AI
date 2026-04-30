@@ -56,3 +56,33 @@
 .note button:focus {
   outline: 2px solid #aaa;
 }
+
+.note button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.note-summary {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  background-color: #f0f4ff;
+  border-left: 3px solid #4a7cdc;
+  border-radius: 0 4px 4px 0;
+}
+
+.note-summary-label {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #4a7cdc;
+  margin-bottom: 0.4rem;
+}
+
+.note-summary p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #333;
+  font-style: italic;
+}

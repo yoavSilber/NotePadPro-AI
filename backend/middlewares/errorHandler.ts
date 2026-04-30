@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { MLServiceError } from "../services/mlService";
 
 export const errorHandler = (
   error: any,
@@ -7,6 +8,13 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   console.error("Error:", error);
+
+  // ML service errors → 502 Bad Gateway (we depend on an upstream)
+  if (error instanceof MLServiceError) {
+    return res.status(502).json({
+      error: "AI service is temporarily unavailable. Please try again.",
+    });
+  }
 
   // JWT errors
   if (error.name === "JsonWebTokenError") {

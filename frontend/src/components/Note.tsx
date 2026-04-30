@@ -4,7 +4,7 @@ import { useNotes } from "../contexts/NotesContext";
 import { useAuth } from "../contexts/AuthContext";
 import { handleApiError, isAuthError } from "../services/errorService";
 import { notesCache } from "../services/cacheService";
-import { getNotes } from "../services/notesService";
+import { getNotes, summarizeNote } from "../services/notesService";
 import "./Note.css";
 
 const BASE_URL = "http://localhost:3001";
@@ -20,6 +20,8 @@ export const Note = ({ note, canEdit = false, token }: NoteProps) => {
   const { dispatch: authDispatch } = useAuth();
   const [editing, setEditing] = useState(false);
   const [content, setContent] = useState(note.content);
+  const [summary, setSummary] = useState<string | null>(note.summary ?? null);
+  const [summarizing, setSummarizing] = useState(false);
 
   const handleDelete = async () => {
     if (!token) {
@@ -79,6 +81,24 @@ export const Note = ({ note, canEdit = false, token }: NoteProps) => {
       if (isAuthError(error)) {
         authDispatch({ type: "LOGOUT" });
       }
+    }
+  };
+
+  const handleSummarize = async () => {
+    if (!token) {
+      dispatch({ type: "set_notification", notification: "Authentication required" });
+      return;
+    }
+    setSummarizing(true);
+    try {
+      const result = await summarizeNote(note._id, token);
+      setSummary(result.summary);
+    } catch (error) {
+      const msg = handleApiError(error);
+      dispatch({ type: "set_notification", notification: msg });
+      if (isAuthError(error)) authDispatch({ type: "LOGOUT" });
+    } finally {
+      setSummarizing(false);
     }
   };
 
@@ -142,7 +162,20 @@ export const Note = ({ note, canEdit = false, token }: NoteProps) => {
               <button data-testid={`edit-${note._id}`} onClick={handleEdit}>
                 Edit
               </button>
+              <button
+                data-testid={`summarize-${note._id}`}
+                onClick={handleSummarize}
+                disabled={summarizing}
+              >
+                {summarizing ? "Summarizing…" : "Summarize"}
+              </button>
             </>
+          )}
+          {summary && (
+            <div className="note-summary" data-testid={`summary-${note._id}`}>
+              <span className="note-summary-label">AI Summary</span>
+              <p>{summary}</p>
+            </div>
           )}
         </>
       ) : (

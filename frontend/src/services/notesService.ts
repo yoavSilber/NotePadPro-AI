@@ -2,7 +2,8 @@ import axios from "axios";
 import { Note } from "../Note";
 import { notesCache } from "./cacheService";
 
-const API_URL = "http://localhost:3001/notes";
+const BASE_URL = "http://localhost:3001";
+const API_URL = `${BASE_URL}/notes`;
 const POSTS_PER_PAGE = 10;
 
 export const getNotes = async (
@@ -68,4 +69,16 @@ export const preloadNotes = async (
   });
 
   await Promise.all(promises);
+};
+
+export const summarizeNote = async (
+  noteId: string,
+  token: string
+): Promise<{ summary: string; summarizedAt: string }> => {
+  const response = await axios.post<{ summary: string; summarizedAt: string }>(
+    `${API_URL}/${noteId}/summarize`,
+    {},
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
 };
