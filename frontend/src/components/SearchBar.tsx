@@ -17,10 +17,16 @@ export const SearchBar = ({ token, onResults }: SearchBarProps) => {
 
     if (!query.trim()) {
       onResults(null); // empty query → restore normal note list
-      return;
+      return () => {
+        if (debounceTimer.current) clearTimeout(debounceTimer.current);
+      };
     }
 
-    if (!token) return;
+    if (!token) {
+      return () => {
+        if (debounceTimer.current) clearTimeout(debounceTimer.current);
+      };
+    }
 
     debounceTimer.current = setTimeout(async () => {
       setLoading(true);
@@ -37,7 +43,7 @@ export const SearchBar = ({ token, onResults }: SearchBarProps) => {
     return () => {
       if (debounceTimer.current) clearTimeout(debounceTimer.current);
     };
-  }, [query, token]);
+  }, [query, token, onResults]);
 
   return (
     <div className="search-bar">

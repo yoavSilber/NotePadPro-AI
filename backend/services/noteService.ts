@@ -15,7 +15,9 @@ const embedAndSave = (noteId: string, content: string) => {
       Note.findByIdAndUpdate(noteId, { embedding, embeddingHash: contentHash })
     )
     .catch((err) =>
-      console.warn(`Embedding failed for note ${noteId}: ${err.message}`)
+      console.warn(
+        `Embedding failed for note ${noteId}: ${err instanceof Error ? err.message : String(err)}`
+      )
     );
 };
 
