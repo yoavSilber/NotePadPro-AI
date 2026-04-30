@@ -4,6 +4,8 @@ import { useNotes } from "../contexts/NotesContext";
 import { useAuth } from "../contexts/AuthContext";
 import { Note } from "../components/Note";
 import { Pagination } from "../components/Pagination";
+import { SearchBar } from "../components/SearchBar";
+import { SearchResult } from "../services/searchService";
 import { getNotes, preloadNotes } from "../services/notesService";
 import { notesCache } from "../services/cacheService";
 
@@ -14,6 +16,7 @@ function HomePage() {
   const [newNoteContent, setNewNoteContent] = useState("");
   const [newNoteTitle, setNewNoteTitle] = useState("");
   const [adding, setAdding] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchResult[] | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,25 +114,54 @@ function HomePage() {
 
       <div className="notification">{notification}</div>
 
-      <div className="notes-container">
-        {notes.map((note) => (
-          <Note
-            key={note._id}
-            note={note}
-            canEdit={
-              authState.isAuthenticated &&
-              authState.user?.email === note.author?.email
-            }
-            token={authState.token}
-          />
-        ))}
-      </div>
+      {authState.isAuthenticated && (
+        <SearchBar
+          token={authState.token}
+          onResults={setSearchResults}
+        />
+      )}
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+      {searchResults !== null ? (
+        <>
+          <p className="search-results-header">
+            {searchResults.length} result{searchResults.length !== 1 ? "s" : ""} found
+          </p>
+          <div className="notes-container">
+            {searchResults.map((note) => (
+              <Note
+                key={note._id}
+                note={note}
+                canEdit={
+                  authState.isAuthenticated &&
+                  authState.user?.email === note.author?.email
+                }
+                token={authState.token}
+              />
+            ))}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="notes-container">
+            {notes.map((note) => (
+              <Note
+                key={note._id}
+                note={note}
+                canEdit={
+                  authState.isAuthenticated &&
+                  authState.user?.email === note.author?.email
+                }
+                token={authState.token}
+              />
+            ))}
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
+      )}
 
       {/* Add Note Form - Only for logged in users */}
       {authState.isAuthenticated && (

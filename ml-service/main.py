@@ -15,10 +15,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from summarizer import Summarizer
+from embedder import Embedder
 
 app = FastAPI(
-    title="NotePad Pro Summarizer",
-    description="AI-powered text summarization using BART",
+    title="NotePad Pro AI Service",
+    description="AI-powered summarization (BART) and semantic embeddings (MiniLM)",
 )
 
 app.add_middleware(
@@ -28,8 +29,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load model at startup — this takes a few seconds on first run
-model = Summarizer()
+# Both models load once at startup and stay in memory for all requests.
+summarizer = Summarizer()
+embedder = Embedder()
 
 
 class SummarizeRequest(BaseModel):
@@ -47,17 +49,30 @@ class SummarizeResponse(BaseModel):
     summary: str
 
 
+class EmbedRequest(BaseModel):
+    text: str
+
+
+class EmbedResponse(BaseModel):
+    embedding: list[float]
+
+
 @app.post("/summarize", response_model=SummarizeResponse)
 def summarize(req: SummarizeRequest):
-    """
-    Takes a text and returns its summary.
-    The heavy lifting is done by the Summarizer class (which uses PyTorch + BART).
-    """
     if len(req.text.strip()) < 50:
         raise HTTPException(status_code=400, detail="Text is too short to summarize")
 
-    summary = model.summarize(req.text, req.max_length, req.min_length)
+    summary = summarizer.summarize(req.text, req.max_length, req.min_length)
     return SummarizeResponse(summary=summary)
+
+
+@app.post("/embed", response_model=EmbedResponse)
+def embed(req: EmbedRequest):
+    if not req.text.strip():
+        raise HTTPException(status_code=400, detail="Text cannot be empty")
+
+    vector = embedder.embed(req.text)
+    return EmbedResponse(embedding=vector)
 
 
 @app.get("/health")

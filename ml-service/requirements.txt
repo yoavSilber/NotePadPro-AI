@@ -3,3 +3,4 @@ uvicorn[standard]
 transformers==4.51.3
 torch
 pandas
+sentence-transformers

@@ -6,6 +6,19 @@ import * as ml from "./mlService";
 const sha256 = (text: string) =>
   createHash("sha256").update(text).digest("hex");
 
+// Fire-and-forget: embed the note content and persist it.
+// Called after create/update — doesn't block the response.
+const embedAndSave = (noteId: string, content: string) => {
+  const contentHash = sha256(content);
+  ml.embed(content)
+    .then((embedding) =>
+      Note.findByIdAndUpdate(noteId, { embedding, embeddingHash: contentHash })
+    )
+    .catch((err) =>
+      console.warn(`Embedding failed for note ${noteId}: ${err.message}`)
+    );
+};
+
 export const getPaginatedNotes = async (_page: number, _per_page: number) => {
   const skip = (_page - 1) * _per_page;
   const notes = await Note.find().sort({ _id: -1 }).skip(skip).limit(_per_page);
@@ -31,7 +44,9 @@ export const createNote = async (data: {
     user: data.user || null,
   });
 
-  return await note.save();
+  const saved = await note.save();
+  embedAndSave(String(saved._id), saved.content);
+  return saved;
 };
 
 export const updateNoteById = async (
@@ -42,7 +57,9 @@ export const updateNoteById = async (
     author?: { name: string; email: string } | null;
   }
 ) => {
-  return await Note.findByIdAndUpdate(id, data, { new: true });
+  const updated = await Note.findByIdAndUpdate(id, data, { new: true });
+  if (updated && data.content) embedAndSave(String(updated._id), updated.content);
+  return updated;
 };
 
 export const deleteNoteById = async (id: string) => {

@@ -1,6 +1,7 @@
 import express from "express";
 import notesRouter from "./routes/notes";
 import usersRouter from "./routes/users";
+import searchRouter from "./routes/search";
 import { requestLogger } from "./middlewares/logger";
 import { errorHandler } from "./middlewares/errorHandler";
 import cors from "cors";
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(requestLogger);
 app.use("/", notesRouter);
 app.use("/", usersRouter);
+app.use("/", searchRouter);
 
 if (process.env.NODE_ENV === "dev") {
   const testRouter = require("./routes/test").default;

@@ -14,9 +14,10 @@ RUN apt-get update \
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Pre-download the BART summarization model so the first request isn't a 1.6GB download.
-# This bakes the model into the image — startup goes from minutes to seconds.
+# Pre-download both models at build time so the first request isn't slow.
+# BART (~1.6GB) for summarization, MiniLM (~80MB) for embeddings.
 RUN python -c "from transformers import pipeline; pipeline('summarization', model='facebook/bart-large-cnn')"
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
 
 COPY . .
 
