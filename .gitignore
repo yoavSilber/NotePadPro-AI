@@ -77,6 +77,13 @@ $RECYCLE_BIN/
 *.sublime-project
 *.sublime-workspace
 
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+ml-service/venv/
+
 # Temporary files
 tmp/
 temp/
