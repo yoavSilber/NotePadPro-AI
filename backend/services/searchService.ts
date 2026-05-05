@@ -23,13 +23,19 @@ export const semanticSearch = async (
 
   const notes = await Note.find(filter).select("+embedding");
 
-  // Score each note and sort highest first
+  // Minimum similarity to be considered relevant.
+  // MiniLM cosine scores: >0.5 = clearly related, 0.3-0.5 = somewhat related,
+  // <0.3 = likely irrelevant. We use 0.25 as a conservative cutoff so that
+  // results are only shown when there is genuine semantic overlap.
+  const MIN_SCORE = 0.25;
+
   const scored = notes
     .filter((n) => n.embedding && n.embedding.length > 0)
     .map((n) => ({
       note: n,
       score: cosineSimilarity(queryEmbedding, n.embedding as number[]),
     }))
+    .filter(({ score }) => score >= MIN_SCORE)
     .sort((a, b) => b.score - a.score)
     .slice(0, topK);
 
