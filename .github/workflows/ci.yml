@@ -89,7 +89,7 @@ jobs:
           cache-dependency-path: ml-service/requirements.txt
 
       - name: Install dependencies
-        run: pip install fastapi uvicorn transformers torch pandas sentence-transformers rouge-score pytest numpy
+        run: pip install -r requirements.txt pytest numpy
         working-directory: ml-service
 
       - name: Run tests

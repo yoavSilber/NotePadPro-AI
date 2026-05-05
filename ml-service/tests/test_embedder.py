@@ -22,13 +22,17 @@ def make_unit_vector(dim=384):
 
 @pytest.fixture
 def embedder():
-    # Inject a fake sentence_transformers module before embedder.py is imported
+    # Inject a fake sentence_transformers module before embedder.py is imported.
+    # Save whatever was there before (real package or nothing) so we can restore
+    # it on teardown and avoid leaking the mock into other test modules.
     mock_st_module = MagicMock()
     mock_model_instance = MagicMock()
     mock_model_instance.encode.return_value = make_unit_vector(384)
     mock_st_module.SentenceTransformer.return_value = mock_model_instance
 
-    sys.modules.setdefault("sentence_transformers", mock_st_module)
+    _sentinel = object()
+    previous_st = sys.modules.get("sentence_transformers", _sentinel)
+    sys.modules["sentence_transformers"] = mock_st_module
 
     # Remove cached embedder module so the fixture always gets a fresh import
     sys.modules.pop("embedder", None)
@@ -36,7 +40,12 @@ def embedder():
     from embedder import Embedder
     yield Embedder()
 
+    # Restore original state
     sys.modules.pop("embedder", None)
+    if previous_st is _sentinel:
+        sys.modules.pop("sentence_transformers", None)
+    else:
+        sys.modules["sentence_transformers"] = previous_st
 
 
 def test_embed_returns_list(embedder):

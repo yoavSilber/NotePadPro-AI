@@ -5,3 +5,4 @@ torch
 pandas
 sentence-transformers
 rouge-score
+numpy

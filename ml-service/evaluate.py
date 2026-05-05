@@ -31,14 +31,23 @@ def main():
     df["summary_word_count"] = df["summary"].str.split().str.len()
     df["compression_ratio"] = (df["summary_word_count"] / df["text_word_count"] * 100).round(1)
 
-    # Compute ROUGE scores for each row
-    scores = df.apply(
-        lambda row: scorer.score(row["reference_summary"], row["summary"]),
-        axis=1,
-    )
-    df["rouge1"] = [s["rouge1"].fmeasure for s in scores]
-    df["rouge2"] = [s["rouge2"].fmeasure for s in scores]
-    df["rougeL"] = [s["rougeL"].fmeasure for s in scores]
+    # Compute ROUGE scores only for rows that have a reference summary
+    if "reference_summary" not in df.columns:
+        df["rouge1"] = float("nan")
+        df["rouge2"] = float("nan")
+        df["rougeL"] = float("nan")
+    else:
+        def _score_row(row):
+            ref = row.get("reference_summary")
+            if not isinstance(ref, str) or not ref.strip():
+                return {"rouge1": None, "rouge2": None, "rougeL": None}
+            s = scorer.score(ref, row["summary"])
+            return {"rouge1": s["rouge1"].fmeasure, "rouge2": s["rouge2"].fmeasure, "rougeL": s["rougeL"].fmeasure}
+
+        rouge_rows = df.apply(_score_row, axis=1, result_type="expand")
+        df["rouge1"] = rouge_rows["rouge1"]
+        df["rouge2"] = rouge_rows["rouge2"]
+        df["rougeL"] = rouge_rows["rougeL"]
 
     # Per-article results
     for _, row in df.iterrows():
@@ -46,14 +55,21 @@ def main():
         print(f"Original  ({row['text_word_count']} words): {row['text'][:100]}...")
         print(f"Summary   ({row['summary_word_count']} words): {row['summary']}")
         print(f"Compression: {row['compression_ratio']}%")
-        print(f"ROUGE-1: {row['rouge1']:.3f}  ROUGE-2: {row['rouge2']:.3f}  ROUGE-L: {row['rougeL']:.3f}\n")
+        if row["rouge1"] is not None and not (isinstance(row["rouge1"], float) and row["rouge1"] != row["rouge1"]):
+            print(f"ROUGE-1: {row['rouge1']:.3f}  ROUGE-2: {row['rouge2']:.3f}  ROUGE-L: {row['rougeL']:.3f}\n")
+        else:
+            print("ROUGE: n/a (no reference summary)\n")
 
-    # Aggregate stats
+    # Aggregate stats (skipna so rows without a reference summary don't break the mean)
     print("=== Overall Statistics ===")
     print(f"Average compression:  {df['compression_ratio'].mean():.1f}%")
-    print(f"Average ROUGE-1:      {df['rouge1'].mean():.3f}")
-    print(f"Average ROUGE-2:      {df['rouge2'].mean():.3f}")
-    print(f"Average ROUGE-L:      {df['rougeL'].mean():.3f}")
+    rouge_rows_count = df["rouge1"].notna().sum()
+    if rouge_rows_count > 0:
+        print(f"Average ROUGE-1:      {df['rouge1'].mean(skipna=True):.3f}  (over {rouge_rows_count} row(s))")
+        print(f"Average ROUGE-2:      {df['rouge2'].mean(skipna=True):.3f}")
+        print(f"Average ROUGE-L:      {df['rougeL'].mean(skipna=True):.3f}")
+    else:
+        print("ROUGE averages: n/a (no reference summaries found)")
 
 
 if __name__ == "__main__":

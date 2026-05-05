@@ -164,7 +164,15 @@ export const Note = ({ note, canEdit = false, token }: NoteProps) => {
           </button>
           {rendered ? (
             <div className="note-markdown-body">
-              <ReactMarkdown>{note.content}</ReactMarkdown>
+              <ReactMarkdown
+                urlTransform={(url) => {
+                  // Block javascript: and data: URIs to prevent XSS via markdown links/images.
+                  const safe = /^(https?:\/\/|\/|#|\?)/i.test(url);
+                  return safe ? url : "";
+                }}
+              >
+                {note.content}
+              </ReactMarkdown>
             </div>
           ) : (
             <p>{note.content}</p>

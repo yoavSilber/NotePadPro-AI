@@ -12,9 +12,8 @@ backend/node_modules/
 frontend/node_modules/
 node_modules/
 
-# Lock files (choose based on your package manager preference)
-backend/package-lock.json
-frontend/package-lock.json
+# Lock files — package-lock.json files are committed so that `npm ci` works in CI.
+# Only ignore alternative package managers if you are not using them.
 pnpm-lock.yaml
 yarn.lock
 
