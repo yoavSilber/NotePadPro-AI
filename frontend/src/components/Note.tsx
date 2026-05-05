@@ -22,7 +22,10 @@ export const Note = ({ note, canEdit = false, token }: NoteProps) => {
   const { dispatch: authDispatch } = useAuth();
   const [editing, setEditing] = useState(false);
   const [content, setContent] = useState(note.content);
-  const [summary, setSummary] = useState<string | null>(note.summary ?? null);
+  // Always start with no summary shown — user must click "AI Summary" to see it.
+  // The summary may already be cached in the DB (fast) but we don't show it
+  // automatically so other users aren't forced to see it without asking.
+  const [summary, setSummary] = useState<string | null>(null);
   const [summarizing, setSummarizing] = useState(false);
   const [rendered, setRendered] = useState(false);
 
