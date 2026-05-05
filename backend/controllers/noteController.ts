@@ -132,17 +132,6 @@ export const summarizeNote = asyncHandler(
       return res.status(404).json({ error: "Note not found" });
     }
 
-    if (
-      existingNote.user &&
-      existingNote.user.toString() !== req.user._id.toString()
-    ) {
-      return res
-        .status(403)
-        .json({
-          error: "Access denied. You can only summarize your own notes.",
-        });
-    }
-
     if (existingNote.content.trim().length < 50) {
       return res
         .status(400)

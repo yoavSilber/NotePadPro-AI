@@ -179,22 +179,26 @@ export const Note = ({ note, canEdit = false, token }: NoteProps) => {
           ) : (
             <p>{note.content}</p>
           )}
-          {canEdit && (
-            <div className="note-actions">
-              <button
-                data-testid={`delete-${note._id}`}
-                onClick={handleDelete}
-                aria-label={`Delete note: ${note.title}`}
-              >
-                Delete
-              </button>
-              <button
-                data-testid={`edit-${note._id}`}
-                onClick={handleEdit}
-                aria-label={`Edit note: ${note.title}`}
-              >
-                Edit
-              </button>
+          <div className="note-actions">
+            {canEdit && (
+              <>
+                <button
+                  data-testid={`delete-${note._id}`}
+                  onClick={handleDelete}
+                  aria-label={`Delete note: ${note.title}`}
+                >
+                  Delete
+                </button>
+                <button
+                  data-testid={`edit-${note._id}`}
+                  onClick={handleEdit}
+                  aria-label={`Edit note: ${note.title}`}
+                >
+                  Edit
+                </button>
+              </>
+            )}
+            {token && (
               <button
                 data-testid={`summarize-${note._id}`}
                 onClick={handleSummarize}
@@ -203,8 +207,8 @@ export const Note = ({ note, canEdit = false, token }: NoteProps) => {
               >
                 {summarizing ? "Summarizing…" : "AI Summary"}
               </button>
-            </div>
-          )}
+            )}
+          </div>
           {summary && (
             <div className="note-summary" data-testid={`summary-${note._id}`}>
               <span className="note-summary-label">AI Summary</span>
