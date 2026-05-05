@@ -11,7 +11,10 @@ import sys
 import requests
 from pymongo import MongoClient
 
-MONGODB_URI = os.environ.get("MONGODB_URI", "mongodb+srv://silberyoav_db_user:H8plfD65NITxmwTG@notepadpro.0l4zn8b.mongodb.net/notepadpro?appName=notepadpro")
+MONGODB_URI = os.environ.get("MONGODB_URI")
+if not MONGODB_URI:
+    sys.exit("Error: MONGODB_URI environment variable is not set.\nRun: MONGODB_URI='your-uri' python scripts/backfill_embeddings.py")
+
 ML_SERVICE_URL = os.environ.get("ML_SERVICE_URL", "https://selfless-endurance-production-89ec.up.railway.app")
 
 
