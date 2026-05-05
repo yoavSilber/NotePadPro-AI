@@ -7,6 +7,7 @@ Used when USE_HF_INFERENCE_API=true is set in the environment.
 """
 
 import os
+import random
 
 import requests
 
@@ -24,10 +25,19 @@ class HFSummarizer:
         # do_sample=True with temperature/top_p makes each call produce a
         # slightly different summary — important for users who want to
         # regenerate and explore alternative phrasings.
+        #
+        # We also randomise max_length slightly (±15 tokens) so that each
+        # request has a unique parameter fingerprint.  HF Inference API caches
+        # responses for byte-identical payloads, so even when sampling is on the
+        # same cached result could be returned for the same article.  Jittering
+        # max_length is a lightweight way to guarantee a fresh inference run
+        # every time without changing the content being summarised.
+        jittered_max = max_length + random.randint(-15, 15)
+        jittered_max = max(min_length + 10, jittered_max)  # keep above min
         payload = {
             "inputs": text,
             "parameters": {
-                "max_length": max_length,
+                "max_length": jittered_max,
                 "min_length": min_length,
                 "do_sample": True,
                 "temperature": 0.9,

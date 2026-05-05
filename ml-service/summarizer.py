@@ -17,6 +17,8 @@ KEY CONCEPTS:
   When you call pipeline(), it loads a PyTorch model internally.
 """
 
+import random
+
 from transformers import pipeline
 
 
@@ -51,10 +53,13 @@ class Summarizer:
               max input (1024 tokens for BART), it will be cut automatically.
         """
         # do_sample=True with temperature/top_p so each call produces a
-        # slightly different summary, matching the production HF behaviour.
+        # slightly different summary.  Jitter max_length slightly so the model
+        # explores different stopping points and produces varied output lengths.
+        jittered_max = max_length + random.randint(-15, 15)
+        jittered_max = max(min_length + 10, jittered_max)
         result = self.pipe(
             text,
-            max_length=max_length,
+            max_length=jittered_max,
             min_length=min_length,
             do_sample=True,
             temperature=0.9,
