@@ -4,8 +4,6 @@ import app from "../expressApp";
 import dotenv from "dotenv";
 dotenv.config();
 
-// Mock ML service — embed returns a deterministic vector based on the input
-// so we can control similarity scores in tests.
 jest.mock("../services/mlService", () => ({
   summarize: jest.fn().mockResolvedValue("mocked summary"),
   embed: jest.fn().mockResolvedValue(Array(384).fill(0.1)),
@@ -49,8 +47,14 @@ describe("GET /search", () => {
     await mongoose.connection.close();
   });
 
-  it("returns 401 when no token is provided", async () => {
+  it("returns 200 for unauthenticated global search (scope=all is public)", async () => {
     const res = await request(app).get("/search?q=cooking");
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  it("returns 401 when scope=mine with no token", async () => {
+    const res = await request(app).get("/search?q=cooking&scope=mine");
     expect(res.status).toBe(401);
   });
 
@@ -69,22 +73,29 @@ describe("GET /search", () => {
     expect(Array.isArray(res.body)).toBe(true);
   });
 
-  it("only returns notes belonging to the authenticated user", async () => {
+  it("scope=mine only returns the authenticated user's own notes", async () => {
     // Create a note as user A
     await request(app)
       .post("/notes")
       .set("Authorization", `Bearer ${token}`)
-      .send({ title: "User A note", content: "This is user A content for search test." });
+      .send({ title: "User A private note", content: "This is user A content for scope test." });
 
-    // Create user B and search
+    // User B searches with scope=mine — should NOT see User A's notes
     const otherToken = await registerAndLogin(`other${Date.now()}`);
     const res = await request(app)
-      .get("/search?q=user A content")
+      .get("/search?q=user A content&scope=mine")
       .set("Authorization", `Bearer ${otherToken}`);
 
     expect(res.status).toBe(200);
-    // User B should not see User A's notes
     const titles = res.body.map((n: any) => n.title);
-    expect(titles).not.toContain("User A note");
+    expect(titles).not.toContain("User A private note");
+  });
+
+  it("scope=all allows any user to search across all notes", async () => {
+    const res = await request(app)
+      .get("/search?q=cooking&scope=all")
+      .set("Authorization", `Bearer ${token}`);
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
   });
 });

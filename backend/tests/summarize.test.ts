@@ -70,12 +70,13 @@ describe("POST /notes/:id/summarize", () => {
     expect(res.status).toBe(401);
   });
 
-  it("returns 403 when a different user tries to summarize", async () => {
+  it("returns 200 when a different authenticated user summarizes (any user can summarize any note)", async () => {
     const otherToken = await registerAndLogin(`other${Date.now()}`);
     const res = await request(app)
       .post(`/notes/${noteId}/summarize`)
       .set("Authorization", `Bearer ${otherToken}`);
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(res.body.summary).toBeDefined();
   });
 
   it("returns 404 for a non-existent note id", async () => {
@@ -87,8 +88,10 @@ describe("POST /notes/:id/summarize", () => {
   });
 
   it("returns 200 with a summary on success", async () => {
+    // Use a fresh note so there is no cached summary from a previous test
+    const freshNoteId = await createNote(token);
     const res = await request(app)
-      .post(`/notes/${noteId}/summarize`)
+      .post(`/notes/${freshNoteId}/summarize`)
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.status).toBe(200);
