@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_BASE_URL } from "../config";
 
 interface CreateUserFormData {
   name: string;
@@ -23,7 +24,7 @@ const CreateUserPage: React.FC = () => {
     setMessage("");
 
     try {
-      const response = await fetch("http://localhost:3001/users", {
+      const response = await fetch(`${API_BASE_URL}/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

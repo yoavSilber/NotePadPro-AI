@@ -14,10 +14,14 @@ RUN apt-get update \
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Pre-download both models at build time so the first request isn't slow.
-# BART (~1.6GB) for summarization, MiniLM (~80MB) for embeddings.
-RUN python -c "from transformers import pipeline; pipeline('summarization', model='facebook/bart-large-cnn')"
+# Pre-download MiniLM (~80MB) for embeddings — always needed.
+# BART is only pre-baked for local dev; in production we use the HF Inference
+# API instead (USE_HF_INFERENCE_API=true), so we skip the 1.6GB download.
+ARG PREBAKE_BART=true
 RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
+RUN if [ "$PREBAKE_BART" = "true" ]; then \
+      python -c "from transformers import pipeline; pipeline('summarization', model='facebook/bart-large-cnn')"; \
+    fi
 
 COPY . .
 

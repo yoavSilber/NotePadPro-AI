@@ -1,7 +1,8 @@
 import axios from "axios";
 import { Note } from "../Note";
+import { API_BASE_URL } from "../config";
 
-const BASE_URL = "http://localhost:3001";
+const BASE_URL = API_BASE_URL;
 
 export interface SearchResult extends Note {
   score: number;

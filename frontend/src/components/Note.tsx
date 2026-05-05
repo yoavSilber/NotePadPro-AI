@@ -7,8 +7,9 @@ import { handleApiError, isAuthError } from "../services/errorService";
 import { notesCache } from "../services/cacheService";
 import { getNotes, summarizeNote } from "../services/notesService";
 import "./Note.css";
+import { API_BASE_URL } from "../config";
 
-const BASE_URL = "http://localhost:3001";
+const BASE_URL = API_BASE_URL;
 
 interface NoteProps {
   note: NoteType;

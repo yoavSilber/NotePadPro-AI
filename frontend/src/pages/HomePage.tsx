@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 import { useNotes } from "../contexts/NotesContext";
 import { useAuth } from "../contexts/AuthContext";
 import { Note } from "../components/Note";
@@ -48,7 +49,7 @@ function HomePage() {
         headers.Authorization = `Bearer ${authState.token}`;
       }
 
-      const res = await fetch("http://localhost:3001/notes", {
+      const res = await fetch(`${API_BASE_URL}/notes`, {
         method: "POST",
         headers,
         body: JSON.stringify({

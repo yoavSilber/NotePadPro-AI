@@ -1,8 +1,9 @@
 import axios from "axios";
 import { Note } from "../Note";
 import { notesCache } from "./cacheService";
+import { API_BASE_URL } from "../config";
 
-const BASE_URL = "http://localhost:3001";
+const BASE_URL = API_BASE_URL;
 const API_URL = `${BASE_URL}/notes`;
 const POSTS_PER_PAGE = 10;
 

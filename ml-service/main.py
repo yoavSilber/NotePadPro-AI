@@ -10,12 +10,25 @@ KEY CONCEPTS:
 Run with: uvicorn main:app --port 8000 --reload
 """
 
+import os
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from summarizer import Summarizer
 from embedder import Embedder
+
+# In production (USE_HF_INFERENCE_API=true) we call the HF Inference API
+# instead of loading the 1.6GB BART model locally.
+# Locally we run BART directly — no API key needed.
+if os.environ.get("USE_HF_INFERENCE_API", "").lower() == "true":
+    from hf_summarizer import HFSummarizer
+    summarizer = HFSummarizer()
+else:
+    from summarizer import Summarizer
+    summarizer = Summarizer()
+
+embedder = Embedder()
 
 app = FastAPI(
     title="NotePad Pro AI Service",
@@ -28,10 +41,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Both models load once at startup and stay in memory for all requests.
-summarizer = Summarizer()
-embedder = Embedder()
 
 
 class SummarizeRequest(BaseModel):
