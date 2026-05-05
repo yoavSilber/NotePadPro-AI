@@ -12,7 +12,7 @@ import requests
 
 
 class HFSummarizer:
-    API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
+    API_URL = "https://router.huggingface.co/hf-inference/models/facebook/bart-large-cnn"
 
     def __init__(self):
         token = os.environ.get("HF_API_TOKEN")
