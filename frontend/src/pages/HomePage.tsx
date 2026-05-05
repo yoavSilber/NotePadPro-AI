@@ -32,6 +32,15 @@ function HomePage() {
     fetchData();
   }, [currentPage, dispatch]);
 
+  // Auto-dismiss notifications after 4 seconds
+  useEffect(() => {
+    if (!notification) return;
+    const timer = setTimeout(() => {
+      dispatch({ type: "set_notification", notification: "" });
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [notification, dispatch]);
+
   const handlePageChange = (page: number) => {
     dispatch({ type: "set_page", page });
   };

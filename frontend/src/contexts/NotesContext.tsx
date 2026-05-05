@@ -20,7 +20,7 @@ const initialState: State = {
   notes: [],
   totalPages: 1,
   currentPage: 1,
-  notification: "Notification area",
+  notification: "",
 };
 
 function notesReducer(state: State, action: Action): State {
