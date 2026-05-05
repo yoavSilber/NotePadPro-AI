@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { Note as NoteType } from "../Note";
 import { useNotes } from "../contexts/NotesContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -22,6 +23,7 @@ export const Note = ({ note, canEdit = false, token }: NoteProps) => {
   const [content, setContent] = useState(note.content);
   const [summary, setSummary] = useState<string | null>(note.summary ?? null);
   const [summarizing, setSummarizing] = useState(false);
+  const [rendered, setRendered] = useState(false);
 
   const handleDelete = async () => {
     if (!token) {
@@ -153,7 +155,20 @@ export const Note = ({ note, canEdit = false, token }: NoteProps) => {
       {note.author && <small>By {note.author.name}</small>}
       {!editing ? (
         <>
-          <p>{note.content}</p>
+          <button
+            className="note-markdown-toggle"
+            onClick={() => setRendered((r) => !r)}
+            title={rendered ? "Show source" : "Render markdown"}
+          >
+            {rendered ? "Source" : "Preview"}
+          </button>
+          {rendered ? (
+            <div className="note-markdown-body">
+              <ReactMarkdown>{note.content}</ReactMarkdown>
+            </div>
+          ) : (
+            <p>{note.content}</p>
+          )}
           {canEdit && (
             <>
               <button data-testid={`delete-${note._id}`} onClick={handleDelete}>
