@@ -50,11 +50,15 @@ class Summarizer:
             - truncation=True means if your text is longer than the model's
               max input (1024 tokens for BART), it will be cut automatically.
         """
+        # do_sample=True with temperature/top_p so each call produces a
+        # slightly different summary, matching the production HF behaviour.
         result = self.pipe(
             text,
             max_length=max_length,
             min_length=min_length,
-            do_sample=False,
+            do_sample=True,
+            temperature=0.9,
+            top_p=0.95,
             truncation=True,
         )
         return result[0]["summary_text"]

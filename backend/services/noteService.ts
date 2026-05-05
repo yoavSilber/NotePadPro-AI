@@ -108,17 +108,13 @@ export const summarizeNoteById = async (id: string) => {
   const note = await Note.findById(id);
   if (!note) return null;
 
-  const contentHash = sha256(note.content);
-
-  // Cache hit: same content was already summarized.
-  if (note.summary && note.summaryHash === contentHash) {
-    return note;
-  }
-
+  // Always call the model for a fresh summary — sampling is enabled so each
+  // click produces a slightly different result, demonstrating real AI behaviour.
+  // We still persist the most recent summary in the DB for reference.
   const summary = await ml.summarize(note.content);
 
   note.summary = summary;
-  note.summaryHash = contentHash;
+  note.summaryHash = sha256(note.content);
   note.summarizedAt = new Date();
   await note.save();
 

@@ -100,7 +100,7 @@ describe("POST /notes/:id/summarize", () => {
     expect(mlService.summarize).toHaveBeenCalledTimes(1);
   });
 
-  it("returns cached summary without calling ML service again for same content", async () => {
+  it("calls the ML service on every request (sampling enabled, no cache)", async () => {
     // First call — generates summary
     await request(app)
       .post(`/notes/${noteId}/summarize`)
@@ -108,13 +108,13 @@ describe("POST /notes/:id/summarize", () => {
 
     jest.clearAllMocks();
 
-    // Second call — content unchanged, should be a cache hit
+    // Second call — should also hit the ML service (no caching)
     const res = await request(app)
       .post(`/notes/${noteId}/summarize`)
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.summary).toBe("This is a mocked summary.");
-    expect(mlService.summarize).not.toHaveBeenCalled();
+    expect(res.body.summary).toBeDefined();
+    expect(mlService.summarize).toHaveBeenCalledTimes(1);
   });
 });

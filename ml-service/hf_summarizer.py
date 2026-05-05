@@ -21,12 +21,17 @@ class HFSummarizer:
         self.headers = {"Authorization": f"Bearer {token}"}
 
     def summarize(self, text: str, max_length: int = 130, min_length: int = 30) -> str:
+        # do_sample=True with temperature/top_p makes each call produce a
+        # slightly different summary — important for users who want to
+        # regenerate and explore alternative phrasings.
         payload = {
             "inputs": text,
             "parameters": {
                 "max_length": max_length,
                 "min_length": min_length,
-                "do_sample": False,
+                "do_sample": True,
+                "temperature": 0.9,
+                "top_p": 0.95,
                 "truncation": True,
             },
         }
