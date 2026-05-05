@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/yoavSilber/NotePadPro-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/yoavSilber/NotePadPro-AI/actions/workflows/ci.yml)
 
+**[Live Demo →](https://note-pad-pro-ai.vercel.app)**
+
 A full-stack note-taking app with two AI features built in: **abstractive summarization** (Meta's BART) and **semantic search** (sentence-transformer embeddings). The ML logic runs as a separate Python microservice; the main backend is Node.js/Express; the frontend is React 19.
 
 ---
