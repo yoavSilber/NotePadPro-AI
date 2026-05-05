@@ -143,6 +143,12 @@ export const summarizeNote = asyncHandler(
         });
     }
 
+    if (existingNote.content.trim().length < 50) {
+      return res
+        .status(400)
+        .json({ error: "Text is too short to summarize. Please write more." });
+    }
+
     const updated = await summarizeNoteById(id);
     if (!updated) {
       return res.status(404).json({ error: "Note not found" });
