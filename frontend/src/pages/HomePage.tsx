@@ -90,30 +90,30 @@ function HomePage() {
 
   return (
     <div className="app">
-      <h1>Notes</h1>
+      <h1>NotePad<span style={{ color: "#4a7cdc" }}>Pro</span> <span style={{ fontSize: "0.6em", color: "#4a7cdc", fontWeight: 600, verticalAlign: "middle" }}>AI</span></h1>
 
       {/* Navigation Section */}
       {!authState.isAuthenticated ? (
-        <div>
+        <div className="nav-buttons">
           <Link to="/login">
-            <button data-testid="go_to_login_button">Go to Login</button>
+            <button data-testid="go_to_login_button">Log in</button>
           </Link>
           <Link to="/create-user">
             <button data-testid="go_to_create_user_button">
-              Create New User
+              Register
             </button>
           </Link>
         </div>
       ) : (
-        <div>
-          <p>Welcome, {authState.user?.name}!</p>
+        <div className="nav-buttons">
+          <span className="welcome-msg">Welcome, {authState.user?.name}!</span>
           <button data-testid="logout" onClick={handleLogout}>
-            Logout
+            Log out
           </button>
         </div>
       )}
 
-      <div className="notification">{notification}</div>
+      {notification && <div className="notification" role="status">{notification}</div>}
 
       {authState.isAuthenticated && (
         <SearchBar
@@ -125,7 +125,9 @@ function HomePage() {
       {searchResults !== null ? (
         <>
           <p className="search-results-header">
-            {searchResults.length} result{searchResults.length !== 1 ? "s" : ""} found
+            {searchResults.length === 0
+              ? "No results found — try different keywords or a broader phrase"
+              : `${searchResults.length} result${searchResults.length !== 1 ? "s" : ""} found`}
           </p>
           <div className="notes-container">
             {searchResults.map((note) => (
@@ -144,17 +146,23 @@ function HomePage() {
       ) : (
         <>
           <div className="notes-container">
-            {notes.map((note) => (
-              <Note
-                key={note._id}
-                note={note}
-                canEdit={
-                  authState.isAuthenticated &&
-                  authState.user?.email === note.author?.email
-                }
-                token={authState.token}
-              />
-            ))}
+            {notes.length === 0 ? (
+              <p className="empty-state">
+                No notes yet.{authState.isAuthenticated ? " Add your first note below!" : " Log in to add notes."}
+              </p>
+            ) : (
+              notes.map((note) => (
+                <Note
+                  key={note._id}
+                  note={note}
+                  canEdit={
+                    authState.isAuthenticated &&
+                    authState.user?.email === note.author?.email
+                  }
+                  token={authState.token}
+                />
+              ))
+            )}
           </div>
           <Pagination
             currentPage={currentPage}
@@ -169,37 +177,43 @@ function HomePage() {
         <div>
           {!adding && (
             <button name="add_new_note" onClick={() => setAdding(true)}>
-              Add new note
+              + Add note
             </button>
           )}
           {adding && (
-            <div>
+            <div className="add-note-form">
+              <label htmlFor="new-note-title" className="sr-only">Note title</label>
               <input
+                id="new-note-title"
                 type="text"
                 value={newNoteTitle}
                 placeholder="Note title"
                 onChange={(e) => setNewNoteTitle(e.target.value)}
               />
+              <label htmlFor="new-note-content" className="sr-only">Note content</label>
               <input
+                id="new-note-content"
                 type="text"
                 value={newNoteContent}
                 name="text_input_new_note"
-                placeholder="Note content"
+                placeholder="Note content (markdown supported)"
                 onChange={(e) => setNewNoteContent(e.target.value)}
               />
-              <button name="text_input_save_new_note" onClick={handleAdd}>
-                Save
-              </button>
-              <button
-                name="text_input_cancel_new_note"
-                onClick={() => {
-                  setAdding(false);
-                  setNewNoteContent("");
-                  setNewNoteTitle("");
-                }}
-              >
-                Cancel
-              </button>
+              <div className="add-note-actions">
+                <button name="text_input_save_new_note" onClick={handleAdd}>
+                  Save
+                </button>
+                <button
+                  name="text_input_cancel_new_note"
+                  onClick={() => {
+                    setAdding(false);
+                    setNewNoteContent("");
+                    setNewNoteTitle("");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           )}
         </div>

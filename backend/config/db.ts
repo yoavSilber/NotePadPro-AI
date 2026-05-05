@@ -3,13 +3,13 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const MONGO_URI = process.env.MONGODB_URI;
-
-if (!MONGO_URI) {
-  throw new Error("MONGODB_URI not found in .env");
-}
-
 export const connectDB = async () => {
+  const MONGO_URI = process.env.MONGODB_URI;
+  if (!MONGO_URI) {
+    console.error("FATAL: MONGODB_URI environment variable is not set.");
+    process.exit(1);
+  }
+
   try {
     await mongoose.connect(MONGO_URI);
     console.log("MongoDB connected!");

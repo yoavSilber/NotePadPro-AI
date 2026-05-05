@@ -160,6 +160,7 @@ export const Note = ({ note, canEdit = false, token }: NoteProps) => {
             className="note-markdown-toggle"
             onClick={() => setRendered((r) => !r)}
             title={rendered ? "Show source" : "Render markdown"}
+            aria-label={rendered ? "Show markdown source" : "Preview rendered markdown"}
           >
             {rendered ? "Source" : "Preview"}
           </button>
@@ -179,21 +180,30 @@ export const Note = ({ note, canEdit = false, token }: NoteProps) => {
             <p>{note.content}</p>
           )}
           {canEdit && (
-            <>
-              <button data-testid={`delete-${note._id}`} onClick={handleDelete}>
+            <div className="note-actions">
+              <button
+                data-testid={`delete-${note._id}`}
+                onClick={handleDelete}
+                aria-label={`Delete note: ${note.title}`}
+              >
                 Delete
               </button>
-              <button data-testid={`edit-${note._id}`} onClick={handleEdit}>
+              <button
+                data-testid={`edit-${note._id}`}
+                onClick={handleEdit}
+                aria-label={`Edit note: ${note.title}`}
+              >
                 Edit
               </button>
               <button
                 data-testid={`summarize-${note._id}`}
                 onClick={handleSummarize}
                 disabled={summarizing}
+                aria-label={`AI summarize note: ${note.title}`}
               >
-                {summarizing ? "Summarizing…" : "Summarize"}
+                {summarizing ? "Summarizing…" : "AI Summary"}
               </button>
-            </>
+            </div>
           )}
           {summary && (
             <div className="note-summary" data-testid={`summary-${note._id}`}>
@@ -208,19 +218,22 @@ export const Note = ({ note, canEdit = false, token }: NoteProps) => {
             data-testid={`text_input-${note._id}`}
             value={content}
             onChange={(e) => setContent(e.target.value)}
+            aria-label="Edit note content"
           />
-          <button
-            data-testid={`text_input_save-${note._id}`}
-            onClick={handleSave}
-          >
-            Save
-          </button>
-          <button
-            data-testid={`text_input_cancel-${note._id}`}
-            onClick={handleCancel}
-          >
-            Cancel
-          </button>
+          <div className="note-actions">
+            <button
+              data-testid={`text_input_save-${note._id}`}
+              onClick={handleSave}
+            >
+              Save
+            </button>
+            <button
+              data-testid={`text_input_cancel-${note._id}`}
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+          </div>
         </>
       )}
     </div>

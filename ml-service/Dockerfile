@@ -27,7 +27,10 @@ COPY . .
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+# start-period gives the container time to load MiniLM before health probes
+# start firing.  MiniLM takes ~5-10s on CPU; 60s matches railway.toml's
+# healthcheckTimeout and gives headroom for slower cold starts.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

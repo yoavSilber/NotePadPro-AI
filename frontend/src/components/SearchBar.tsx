@@ -49,10 +49,11 @@ export const SearchBar = ({ token, onResults }: SearchBarProps) => {
     <div className="search-bar">
       <input
         type="text"
-        placeholder="Search your notes by meaning…"
+        placeholder="Search your notes by meaning… (AI-powered)"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         data-testid="search-input"
+        aria-label="Semantic search notes"
       />
       {loading && <span className="search-loading">Searching…</span>}
       {!loading && query.trim() && (

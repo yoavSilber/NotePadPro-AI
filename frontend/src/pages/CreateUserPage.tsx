@@ -54,13 +54,15 @@ const CreateUserPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Create New User</h1>
-      {error && <div style={{ color: "red" }}>{error}</div>}
-      {message && <div style={{ color: "green" }}>{message}</div>}
-      <form data-testid="create_user_form" onSubmit={handleSubmit}>
-        <div>
+    <div className="auth-page">
+      <h1>Create Account</h1>
+      {error && <div className="auth-error" role="alert">{error}</div>}
+      {message && <div className="auth-success" role="status">{message}</div>}
+      <form className="auth-form" data-testid="create_user_form" onSubmit={handleSubmit}>
+        <div className="form-field">
+          <label htmlFor="create-name">Full Name</label>
           <input
+            id="create-name"
             type="text"
             name="name"
             placeholder="Full Name"
@@ -68,10 +70,13 @@ const CreateUserPage: React.FC = () => {
             onChange={handleChange}
             data-testid="create_user_form_name"
             required
+            autoComplete="name"
           />
         </div>
-        <div>
+        <div className="form-field">
+          <label htmlFor="create-email">Email</label>
           <input
+            id="create-email"
             type="email"
             name="email"
             placeholder="Email"
@@ -79,10 +84,13 @@ const CreateUserPage: React.FC = () => {
             onChange={handleChange}
             data-testid="create_user_form_email"
             required
+            autoComplete="email"
           />
         </div>
-        <div>
+        <div className="form-field">
+          <label htmlFor="create-username">Username</label>
           <input
+            id="create-username"
             type="text"
             name="username"
             placeholder="Username"
@@ -90,10 +98,13 @@ const CreateUserPage: React.FC = () => {
             onChange={handleChange}
             data-testid="create_user_form_username"
             required
+            autoComplete="username"
           />
         </div>
-        <div>
+        <div className="form-field">
+          <label htmlFor="create-password">Password</label>
           <input
+            id="create-password"
             type="password"
             name="password"
             placeholder="Password"
@@ -101,10 +112,11 @@ const CreateUserPage: React.FC = () => {
             onChange={handleChange}
             data-testid="create_user_form_password"
             required
+            autoComplete="new-password"
           />
         </div>
         <button type="submit" data-testid="create_user_form_create_user">
-          Create User
+          Create Account
         </button>
       </form>
     </div>

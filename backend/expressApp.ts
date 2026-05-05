@@ -10,7 +10,11 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://note-pad-pro-ai.vercel.app"],
+    origin: [
+      "http://localhost:3000",
+      "https://note-pad-pro-ai.vercel.app",
+      "https://www.note-pad-pro-ai.vercel.app",
+    ],
     credentials: true,
     exposedHeaders: ["X-Total-Count"],
   })

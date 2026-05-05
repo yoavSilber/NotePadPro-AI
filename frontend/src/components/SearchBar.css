@@ -13,6 +13,12 @@
   border-radius: 6px;
   font-family: inherit;
   transition: border-color 0.2s;
+  background-color: #fff;
+  color: #213547;
+}
+
+.search-bar input::placeholder {
+  color: #888;
 }
 
 .search-bar input:focus {
@@ -47,6 +53,28 @@
 
 .search-results-header {
   font-size: 0.85rem;
-  color: #666;
+  color: #555;
   margin-bottom: 0.75rem;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  .search-bar input {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border-color: #555;
+  }
+
+  .search-bar input::placeholder {
+    color: #777;
+  }
+
+  .search-clear:hover {
+    color: #ddd;
+    background-color: #444;
+  }
+
+  .search-results-header {
+    color: #aaa;
+  }
 }

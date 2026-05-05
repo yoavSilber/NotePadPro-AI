@@ -50,12 +50,14 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      {error && <div style={{ color: "red" }}>{error}</div>}
-      <form data-testid="login_form" onSubmit={handleSubmit}>
-        <div>
+    <div className="auth-page">
+      <h1>Log in</h1>
+      {error && <div className="auth-error" role="alert">{error}</div>}
+      <form className="auth-form" data-testid="login_form" onSubmit={handleSubmit}>
+        <div className="form-field">
+          <label htmlFor="login-username">Username</label>
           <input
+            id="login-username"
             type="text"
             name="username"
             placeholder="Username"
@@ -63,10 +65,13 @@ const LoginPage: React.FC = () => {
             onChange={handleChange}
             data-testid="login_form_username"
             required
+            autoComplete="username"
           />
         </div>
-        <div>
+        <div className="form-field">
+          <label htmlFor="login-password">Password</label>
           <input
+            id="login-password"
             type="password"
             name="password"
             placeholder="Password"
@@ -74,10 +79,11 @@ const LoginPage: React.FC = () => {
             onChange={handleChange}
             data-testid="login_form_password"
             required
+            autoComplete="current-password"
           />
         </div>
         <button type="submit" data-testid="login_form_login">
-          Login
+          Log in
         </button>
       </form>
     </div>

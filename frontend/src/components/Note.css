@@ -36,15 +36,26 @@
   font-family: inherit;
   border: 1px solid #ccc;
   border-radius: 4px;
+  background-color: #fff;
+  color: #222;
+  box-sizing: border-box;
+}
+
+.note-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
 }
 
 .note button {
   padding: 0.4rem 0.8rem;
   font-size: 0.9rem;
-  margin-right: 0.5rem;
+  margin-right: 0;
   border: none;
   border-radius: 4px;
   background-color: #eee;
+  color: #222;
   cursor: pointer;
   transition: background-color 0.2s;
 }
@@ -122,6 +133,7 @@
 
 .note-markdown-body code {
   background: #f0f0f0;
+  color: #222;
   padding: 0.1rem 0.3rem;
   border-radius: 3px;
   font-size: 0.9em;
@@ -132,4 +144,71 @@
   padding: 0.75rem;
   border-radius: 4px;
   overflow-x: auto;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  .note {
+    background-color: #2a2a2a;
+    border-color: #444;
+  }
+
+  .note h2 {
+    color: #e8e8e8;
+  }
+
+  .note small {
+    color: #aaa;
+  }
+
+  .note p {
+    color: #ccc;
+  }
+
+  .note textarea {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border-color: #555;
+  }
+
+  .note button {
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+  }
+
+  .note button:hover {
+    background-color: #4a4a4a;
+  }
+
+  .note-summary {
+    background-color: #1c2a44;
+    border-left-color: #4a7cdc;
+  }
+
+  .note-summary p {
+    color: #ccc;
+  }
+
+  .note-markdown-toggle {
+    background-color: #333;
+    border-color: #555;
+    color: #ccc;
+  }
+
+  .note-markdown-toggle:hover {
+    background-color: #444;
+  }
+
+  .note-markdown-body {
+    color: #ccc;
+  }
+
+  .note-markdown-body code {
+    background: #2d2d2d;
+    color: #e0e0e0;
+  }
+
+  .note-markdown-body pre {
+    background: #2d2d2d;
+  }
 }

@@ -8,7 +8,7 @@ RUN npm ci
 
 COPY . .
 # Compile TypeScript to dist/
-RUN npx tsc --outDir dist
+RUN npx tsc
 
 # ── Runtime stage ──────────────────────────────────────────────────────────────
 FROM node:20-slim

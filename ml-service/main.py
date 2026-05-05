@@ -10,6 +10,7 @@ KEY CONCEPTS:
 Run with: uvicorn main:app --port 8000 --reload
 """
 
+import math
 import os
 
 from fastapi import FastAPI, HTTPException
@@ -69,9 +70,13 @@ class EmbedResponse(BaseModel):
 @app.post("/summarize", response_model=SummarizeResponse)
 def summarize(req: SummarizeRequest):
     if len(req.text.strip()) < 50:
-        raise HTTPException(status_code=400, detail="Text is too short to summarize")
+        raise HTTPException(status_code=400, detail="Text is too short to summarize (need at least 50 non-whitespace characters)")
 
-    summary = summarizer.summarize(req.text, req.max_length, req.min_length)
+    try:
+        summary = summarizer.summarize(req.text, req.max_length, req.min_length)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
     return SummarizeResponse(summary=summary)
 
 
@@ -80,10 +85,22 @@ def embed(req: EmbedRequest):
     if not req.text.strip():
         raise HTTPException(status_code=400, detail="Text cannot be empty")
 
-    vector = embedder.embed(req.text)
+    try:
+        vector = embedder.embed(req.text)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    # Guard against NaN/Inf values that would silently corrupt downstream
+    # cosine-similarity calculations (e.g. if the model produces degenerate output).
+    if any(not math.isfinite(v) for v in vector):
+        raise HTTPException(
+            status_code=500,
+            detail="Embedding contains non-finite values (NaN/Inf) — this is a model bug",
+        )
+
     return EmbedResponse(embedding=vector)
 
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "embedder_available": embedder._available}
