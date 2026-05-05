@@ -12,7 +12,10 @@ services:
 
   # ── Python ML microservice (BART summarize + MiniLM embed) ───────────────────
   ml-service:
-    build: ./ml-service
+    build:
+      context: ./ml-service
+      args:
+        PREBAKE_BART: "true"
     ports:
       - "8000:8000"
     volumes:
