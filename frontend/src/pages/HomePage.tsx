@@ -124,12 +124,11 @@ function HomePage() {
 
       {notification && <div className="notification" role="status">{notification}</div>}
 
-      {authState.isAuthenticated && (
-        <SearchBar
-          token={authState.token}
-          onResults={setSearchResults}
-        />
-      )}
+      <SearchBar
+        token={authState.token}
+        isAuthenticated={authState.isAuthenticated}
+        onResults={setSearchResults}
+      />
 
       {searchResults !== null ? (
         <>

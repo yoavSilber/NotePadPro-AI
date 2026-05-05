@@ -10,11 +10,15 @@ export interface SearchResult extends Note {
 
 export const semanticSearch = async (
   query: string,
-  token: string
+  scope: "all" | "mine" = "all",
+  token?: string | null
 ): Promise<SearchResult[]> => {
+  const headers: Record<string, string> = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
   const response = await axios.get<SearchResult[]>(`${BASE_URL}/search`, {
-    params: { q: query },
-    headers: { Authorization: `Bearer ${token}` },
+    params: { q: query, scope },
+    headers,
   });
   return response.data;
 };

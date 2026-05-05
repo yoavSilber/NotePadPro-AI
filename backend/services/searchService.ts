@@ -11,18 +11,17 @@ const cosineSimilarity = (a: number[], b: number[]): number => {
 
 export const semanticSearch = async (
   query: string,
-  userId: string,
+  userId: string | null,  // null = search all notes (global scope)
   topK = 20
 ) => {
-  // Get the embedding for the search query
   const queryEmbedding = await ml.embed(query);
 
-  // Load only this user's notes that have been embedded.
-  // `embedding` has select:false on the schema so we must explicitly request it.
-  const notes = await Note.find({
-    user: userId,
-    embeddingHash: { $exists: true },
-  }).select("+embedding");
+  // userId = null → global search across all notes
+  // userId = string → search only that user's notes
+  const filter: Record<string, unknown> = { embeddingHash: { $exists: true } };
+  if (userId) filter.user = userId;
+
+  const notes = await Note.find(filter).select("+embedding");
 
   // Score each note and sort highest first
   const scored = notes
