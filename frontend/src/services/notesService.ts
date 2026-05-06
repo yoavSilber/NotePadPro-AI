@@ -76,10 +76,16 @@ export const summarizeNote = async (
   noteId: string,
   token: string
 ): Promise<{ summary: string; summarizedAt: string }> => {
+  // 95s ceiling — slightly higher than the backend's 90s ML timeout so the
+  // backend's friendly error reaches us before axios aborts.  Without an
+  // explicit timeout, axios waits forever and the spinner gets stuck.
   const response = await axios.post<{ summary: string; summarizedAt: string }>(
     `${API_URL}/${noteId}/summarize`,
     {},
-    { headers: { Authorization: `Bearer ${token}` } }
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      timeout: 95_000,
+    }
   );
   return response.data;
 };

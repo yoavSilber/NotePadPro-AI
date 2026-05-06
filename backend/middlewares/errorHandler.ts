@@ -11,6 +11,15 @@ export const errorHandler = (
 
   // ML service errors → 502 Bad Gateway (we depend on an upstream)
   if (error instanceof MLServiceError) {
+    if (error.warmingUp) {
+      // 503 Service Unavailable is more semantically correct for "try again
+      // shortly" — and lets the frontend render a friendlier message.
+      return res.status(503).json({
+        error:
+          "The AI model is warming up — this happens once after a model swap or long idle. Please try again in ~30 seconds.",
+        warmingUp: true,
+      });
+    }
     return res.status(502).json({
       error: "AI service is temporarily unavailable. Please try again.",
     });
