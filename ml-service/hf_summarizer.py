@@ -1,6 +1,6 @@
 """
 Production summarizer — calls the Hugging Face Inference API instead of
-running BART locally. Same model (facebook/bart-large-cnn), same output,
+running BART locally. Same model (facebook/bart-large-xsum), same output,
 but zero memory cost on the server.
 
 Used when USE_HF_INFERENCE_API=true is set in the environment.
@@ -13,7 +13,12 @@ import requests
 
 
 class HFSummarizer:
-    API_URL = "https://router.huggingface.co/hf-inference/models/facebook/bart-large-cnn"
+    # bart-large-xsum is trained on XSum (BBC articles → single highly
+    # abstractive headline-like summary).  Unlike bart-large-cnn (which often
+    # extracts/copies full sentences from the input), XSum's training forces
+    # the model to *paraphrase* and condense — so summaries actually look
+    # like summaries instead of trimmed copies of the source text.
+    API_URL = "https://router.huggingface.co/hf-inference/models/facebook/bart-large-xsum"
 
     def __init__(self):
         token = os.environ.get("HF_API_TOKEN")
@@ -21,7 +26,7 @@ class HFSummarizer:
             raise RuntimeError("HF_API_TOKEN environment variable is not set")
         self.headers = {"Authorization": f"Bearer {token}"}
 
-    def summarize(self, text: str, max_length: int = 130, min_length: int = 30) -> str:
+    def summarize(self, text: str, max_length: int = 60, min_length: int = 15) -> str:
         # Adapt the length budget to the input.  BART-large-CNN was trained on
         # long news articles, so given a short paragraph it just copies whole
         # sentences (extractive) rather than rewriting them (abstractive).

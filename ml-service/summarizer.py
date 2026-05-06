@@ -29,12 +29,14 @@ class Summarizer:
         First run downloads ~1.6GB of model weights to ~/.cache/huggingface/.
         Subsequent runs load from cache (fast).
         """
+        # bart-large-xsum produces highly abstractive (paraphrased) summaries
+        # rather than the extractive sentence-copying behaviour of bart-large-cnn.
         self.pipe = pipeline(
             task="summarization",
-            model="facebook/bart-large-cnn",
+            model="facebook/bart-large-xsum",
         )
 
-    def summarize(self, text: str, max_length: int = 130, min_length: int = 30) -> str:
+    def summarize(self, text: str, max_length: int = 60, min_length: int = 15) -> str:
         """
         Summarize the given text.
 
