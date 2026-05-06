@@ -22,26 +22,35 @@ class HFSummarizer:
         self.headers = {"Authorization": f"Bearer {token}"}
 
     def summarize(self, text: str, max_length: int = 130, min_length: int = 30) -> str:
-        # do_sample=True with temperature/top_p makes each call produce a
-        # slightly different summary — important for users who want to
-        # regenerate and explore alternative phrasings.
-        #
-        # We also randomise max_length slightly (±15 tokens) so that each
-        # request has a unique parameter fingerprint.  HF Inference API caches
-        # responses for byte-identical payloads, so even when sampling is on the
-        # same cached result could be returned for the same article.  Jittering
-        # max_length is a lightweight way to guarantee a fresh inference run
-        # every time without changing the content being summarised.
-        jittered_max = max_length + random.randint(-15, 15)
-        jittered_max = max(min_length + 10, jittered_max)  # keep above min
+        # Adapt the length budget to the input.  BART-large-CNN was trained on
+        # long news articles, so given a short paragraph it just copies whole
+        # sentences (extractive) rather than rewriting them (abstractive).
+        # Targeting ~35-40% of the input length forces real compression.
+        word_count = len(text.split())
+        target_max = max(30, min(max_length, int(word_count * 0.4)))
+        target_min = max(12, min(min_length, int(word_count * 0.15)))
+
+        # Jitter max_length so each request payload is unique — HF Inference API
+        # caches identical payloads, so even with do_sample=True we'd get the
+        # same cached response back without this.
+        jittered_max = target_max + random.randint(-8, 8)
+        jittered_max = max(target_min + 5, jittered_max)
+
         payload = {
             "inputs": text,
             "parameters": {
                 "max_length": jittered_max,
-                "min_length": min_length,
+                "min_length": target_min,
                 "do_sample": True,
                 "temperature": 0.9,
                 "top_p": 0.95,
+                # length_penalty < 1.0 actively discourages keeping long
+                # verbatim chunks of the input — pushes the model towards
+                # rephrasing instead of copying.
+                "length_penalty": 0.7,
+                # Prevent reusing 3-grams from the source verbatim — the
+                # model has to find different phrasings.
+                "no_repeat_ngram_size": 3,
                 "truncation": True,
             },
         }

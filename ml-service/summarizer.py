@@ -52,18 +52,27 @@ class Summarizer:
             - truncation=True means if your text is longer than the model's
               max input (1024 tokens for BART), it will be cut automatically.
         """
-        # do_sample=True with temperature/top_p so each call produces a
-        # slightly different summary.  Jitter max_length slightly so the model
-        # explores different stopping points and produces varied output lengths.
-        jittered_max = max_length + random.randint(-15, 15)
-        jittered_max = max(min_length + 10, jittered_max)
+        # Adapt the length budget to the input.  BART-large-CNN was trained on
+        # long news articles — given a short paragraph it copies sentences
+        # rather than rewriting them.  Targeting ~40% of input length forces
+        # real compression so the model has to rephrase.
+        word_count = len(text.split())
+        target_max = max(30, min(max_length, int(word_count * 0.4)))
+        target_min = max(12, min(min_length, int(word_count * 0.15)))
+
+        # Jitter for variety + cache busting.
+        jittered_max = target_max + random.randint(-8, 8)
+        jittered_max = max(target_min + 5, jittered_max)
+
         result = self.pipe(
             text,
             max_length=jittered_max,
-            min_length=min_length,
+            min_length=target_min,
             do_sample=True,
             temperature=0.9,
             top_p=0.95,
+            length_penalty=0.7,        # discourage verbatim copying
+            no_repeat_ngram_size=3,    # block reusing 3-grams from input
             truncation=True,
         )
         return result[0]["summary_text"]
