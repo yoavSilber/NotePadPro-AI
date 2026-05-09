@@ -1,34 +1,30 @@
-/* Pagination.css */
+/* Pagination — numbered page buttons with active highlight.
+   Consumes design tokens from index.css. */
 
 .pagination {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
+  gap: var(--space-1);
+  margin-top: var(--space-6);
 }
 
 .pagination button {
-  color: #000;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 0.4rem 0.8rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  min-width: 2.25rem;
+  font-size: var(--text-sm);
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius-sm);
 }
 
-.pagination button:hover:not(:disabled) {
-  background-color: #f0f0f0;
-}
-
-.pagination button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
+/* Inline style="font-weight: bold" is set on the active page button by the
+   component — match it via attr selector and bump it to a real active style. */
 .pagination button[style*="font-weight: bold"] {
-  background-color: #ddd;
-  font-weight: bold;
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #ffffff;
+}
+
+.pagination button[style*="font-weight: bold"]:hover {
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
 }

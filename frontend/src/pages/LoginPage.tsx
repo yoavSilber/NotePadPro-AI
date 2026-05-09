@@ -82,7 +82,11 @@ const LoginPage: React.FC = () => {
             autoComplete="current-password"
           />
         </div>
-        <button type="submit" data-testid="login_form_login">
+        <button
+          type="submit"
+          className="btn-primary"
+          data-testid="login_form_login"
+        >
           Log in
         </button>
       </form>

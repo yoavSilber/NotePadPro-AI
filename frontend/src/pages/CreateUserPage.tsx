@@ -115,7 +115,11 @@ const CreateUserPage: React.FC = () => {
             autoComplete="new-password"
           />
         </div>
-        <button type="submit" data-testid="create_user_form_create_user">
+        <button
+          type="submit"
+          className="btn-primary"
+          data-testid="create_user_form_create_user"
+        >
           Create Account
         </button>
       </form>

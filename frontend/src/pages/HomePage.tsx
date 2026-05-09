@@ -99,7 +99,10 @@ function HomePage() {
 
   return (
     <div className="app">
-      <h1>NotePad<span style={{ color: "#4a7cdc" }}>Pro</span> <span style={{ fontSize: "0.6em", color: "#4a7cdc", fontWeight: 600, verticalAlign: "middle" }}>AI</span></h1>
+      <h1 className="app-title">NotePadPro AI</h1>
+      <p className="app-subtitle">
+        Notes with AI summaries and semantic search
+      </p>
 
       {/* Navigation Section */}
       {!authState.isAuthenticated ? (
@@ -184,7 +187,11 @@ function HomePage() {
       {authState.isAuthenticated && (
         <div>
           {!adding && (
-            <button name="add_new_note" onClick={() => setAdding(true)}>
+            <button
+              className="btn-primary"
+              name="add_new_note"
+              onClick={() => setAdding(true)}
+            >
               + Add note
             </button>
           )}
@@ -208,7 +215,11 @@ function HomePage() {
                 onChange={(e) => setNewNoteContent(e.target.value)}
               />
               <div className="add-note-actions">
-                <button name="text_input_save_new_note" onClick={handleAdd}>
+                <button
+                  className="btn-primary"
+                  name="text_input_save_new_note"
+                  onClick={handleAdd}
+                >
                   Save
                 </button>
                 <button
