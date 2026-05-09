@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -51,7 +52,8 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="auth-page">
-      <h1>Log in</h1>
+      <Link to="/" className="auth-back-link">← Back</Link>
+      <h2>Log in</h2>
       {error && <div className="auth-error" role="alert">{error}</div>}
       <form className="auth-form" data-testid="login_form" onSubmit={handleSubmit}>
         <div className="form-field">
@@ -90,6 +92,10 @@ const LoginPage: React.FC = () => {
           Log in
         </button>
       </form>
+
+      <p className="auth-footer">
+        No account yet? <Link to="/create-user">Register</Link>
+      </p>
     </div>
   );
 };

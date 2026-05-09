@@ -113,6 +113,26 @@
   text-align: center;
 }
 
+/* Back link sits above the heading */
+.auth-back-link {
+  display: inline-block;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+  transition: color var(--transition-fast);
+}
+.auth-back-link:hover {
+  color: var(--color-text);
+}
+
+/* "Already have an account?" footer */
+.auth-footer {
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
 .auth-form {
   display: flex;
   flex-direction: column;

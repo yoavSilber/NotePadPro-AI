@@ -185,7 +185,7 @@ function HomePage() {
 
       {/* Add Note Form - Only for logged in users */}
       {authState.isAuthenticated && (
-        <div>
+        <div style={{ marginTop: "2.5rem" }}>
           {!adding && (
             <button
               className="btn-primary"
