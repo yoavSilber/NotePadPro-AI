@@ -40,7 +40,7 @@ class ClaudeSummarizer:
             raise RuntimeError("ANTHROPIC_API_KEY environment variable is not set")
         self.client = anthropic.Anthropic(api_key=api_key)
 
-    def summarize(self, text: str, **_kwargs) -> str:
+    def summarize(self, text: str, max_length: int = 60, min_length: int = 15) -> str:
         """
         Summarize text using Claude Haiku.
 
