@@ -19,10 +19,18 @@ from pydantic import BaseModel
 
 from embedder import Embedder
 
-# In production (USE_HF_INFERENCE_API=true) we call the HF Inference API
-# instead of loading the 1.6GB BART model locally.
-# Locally we run BART directly — no API key needed.
-if os.environ.get("USE_HF_INFERENCE_API", "").lower() == "true":
+# Summarizer selection (checked in priority order):
+#
+#   USE_CLAUDE_API=true   → Claude Haiku via Anthropic SDK (best quality,
+#                           near-zero cost, requires ANTHROPIC_API_KEY)
+#   USE_HF_INFERENCE_API=true → BART-large-xsum via HF Inference API
+#                           (free but lower quality, requires HF_API_TOKEN)
+#   (default)             → BART-large-xsum loaded locally (no API key,
+#                           ~1.6 GB download on first run — dev only)
+if os.environ.get("USE_CLAUDE_API", "").lower() == "true":
+    from claude_summarizer import ClaudeSummarizer
+    summarizer = ClaudeSummarizer()
+elif os.environ.get("USE_HF_INFERENCE_API", "").lower() == "true":
     from hf_summarizer import HFSummarizer
     summarizer = HFSummarizer()
 else:
